@@ -33,7 +33,24 @@
 static uint64_t g_num_calls = 0;
 static CRYPTO_MUTEX g_num_calls_lock = CRYPTO_MUTEX_INIT;
 
-void RAND_reset_for_fuzzing(void) { g_num_calls = 0; }
+static void rand_thread_state_free(void *state_in) {
+  struct rand_thread_state *state = state_in;
+
+  if (state_in == NULL) {
+    return;
+  }
+
+  OPENSSL_free(state);
+}
+
+void RAND_reset_for_fuzzing(void) {
+  g_num_calls = 0;
+  struct rand_thread_state *state =
+      CRYPTO_get_thread_local(OPENSSL_THREAD_LOCAL_RAND);
+  rand_thread_state_free(state);
+
+  CRYPTO_set_thread_local(OPENSSL_THREAD_LOCAL_RAND, NULL, NULL);
+}
 
 void CRYPTO_sysrand(uint8_t *out, size_t requested) {
   static const uint8_t kZeroKey[32];
