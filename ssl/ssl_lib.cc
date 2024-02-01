@@ -499,6 +499,28 @@ BSSL_NAMESPACE_END
 
 using namespace bssl;
 
+int PUFFIN_extract_transcript(SSL *ssl, uint8_t *out, size_t *out_len) {
+  SSL_HANDSHAKE *hs = ssl->s3->hs.get();
+
+  if (hs == NULL) {
+    return 0;
+  } else {
+    hs->transcript.GetHash(out, out_len);
+  }
+
+  return 1;
+}
+
+
+const char *PUFFIN_get_server_handshake_state(SSL *ssl) {
+  SSL_HANDSHAKE *hs = ssl->s3->hs.get();
+  if (hs == NULL) {
+    return "NULL HANDSHAKE";
+  }
+  return tls13_server_handshake_state(hs);
+}
+
+
 int SSL_library_init(void) {
   CRYPTO_library_init();
   return 1;
