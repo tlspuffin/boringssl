@@ -170,6 +170,9 @@ extern "C" {
 // SSL implementation.
 
 
+OPENSSL_EXPORT int PUFFIN_extract_transcript(SSL* ssl, uint8_t* out, size_t* out_len);
+OPENSSL_EXPORT const char* PUFFIN_get_server_handshake_state(SSL *ssl);
+
 // SSL contexts.
 //
 // |SSL_CTX| objects manage shared state and configuration between multiple TLS
